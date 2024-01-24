@@ -1,0 +1,112 @@
+[SYSTEM_MESSAGE]
+python = """
+You are an extremely good programmer. Provide all code in code blocks with no
+comments. All code in the same file should be in the same codeblock. Put the
+langauge you are using in the first line of the code block. If the module
+name does not match a pypi package please use bash and pip to install it. To
+run commands in the shell, use bash at the top of the codeblock.  Put the bash
+ codeblock first.  This is executing in a docker container.  Do not user
+ interactive commands like input. Docker is very limited in commands, but
+ you can use apt to install packages.  Install nodejs when needed with apt.
+ We are targeting pythin 3.11, FastAPI 0.109.0, and React.js 18.2.0.  Provide
+ the best code you can.  Focus on being clean and pythonic."""
+
+
+[TEST_MESSAGES]
+input = """
+Here is a simple example of how you could set up a FastAPI server to handle conversations and a React.js frontend for the user.
+
+First, let's create a new FastAPI project:
+
+```bash
+mkdir fastapi_react_chatbot
+cd fastapi_react_chatbot
+python3 -m venv env
+source env/bin/activate
+pip install fastapi uvicorn[standard]
+touch main.py
+```
+
+In `main.py`, we will create a simple FastAPI server:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Message(BaseModel):
+    text: str
+
+@app.post("/chat/")
+async def chat(message: Message):
+    return {"response": f"You said: {message.text}"}
+```
+
+Now, let's create a new React.js project:
+
+```bash
+npx create-react-app frontend
+cd frontend
+npm install axios
+touch src/App.js
+```
+
+In `src/App.js`, we will create a simple React.js app that sends a POST request to our FastAPI server and displays the response:
+
+```javascript
+import React from 'react';
+import axios from 'axios';
+
+class App extends React.Component {
+  state = { text: '', response: '' };
+
+  handleChange = (event) => {
+    this.setState({ text: event.target.value });
+  }
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const response = await axios.post('http://localhost:8000/chat/', { text: this.state.text });
+    this.setState({ response: response.data.response });
+  }
+
+  render() {
+    return (
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <input type="text" value={this.state.text} onChange={this.handleChange} />
+          <button type="submit">Send</button>
+        </form>
+        <p>{this.state.response}</p>
+      </div>
+    );
+  }
+}
+
+export default App;
+```
+
+This is a very basic example of how you can create a chatbot with FastAPI and React. It's not a real chatbot, but it gives you an
+idea of what you could do. You would need to add more functionality to make it into a full-fledged chatbot, such as natural
+language processing for understanding the user's input and generating appropriate responses.
+
+To run this example, first start your FastAPI server:
+
+```bash
+uvicorn main:app --reload
+```
+
+Then start your React app:
+
+```bash
+npm start
+```
+
+And navigate to `http://localhost:3000` in your web browser. You should see a text input and a button that says "Send". Type
+something into the input, click the button, and you should see your message displayed below.
+
+This is just a simple example of how you can use FastAPI with React to create a chatbot. There are many other ways you could
+structure this application, depending on what exactly you're trying to accomplish.
+
+"""
