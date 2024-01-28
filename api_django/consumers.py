@@ -39,7 +39,7 @@ class GenerateConsumer(AsyncJsonWebsocketConsumer):
         executor.submit(self.docker_manager.remove_container)
         raise StopConsumer()
 
-    async def receive(self, text_data: str = None, bytes_data: bytes = None, **kwargs) -> None:
+    async def receive(self, text_data: str | None = None, bytes_data: bytes | None = None, **kwargs) -> None:
         if text_data is None:
             return
         data = json.loads(text_data)
@@ -58,7 +58,7 @@ class GenerateConsumer(AsyncJsonWebsocketConsumer):
             raise Exception("Chat data processor not initialized.")
         await self.chat_data_processor.process_prompt(prompt_text, model_name=model_name, test_input=test_input)
 
-    async def send(self, text_data: str = None, bytes_data: bytes = None, close: bool = False) -> None:
+    async def send(self, text_data: str | None = None, bytes_data: bytes | None = None, close: bool = False) -> None:
         pass
 
     @database_sync_to_async

@@ -12,12 +12,26 @@ from urllib.parse import urlparse
 import requests
 import openai
 from openai import AsyncStream
-from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
+from openai.types.chat import (
+    ChatCompletionAssistantMessageParam,
+    ChatCompletionFunctionMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionToolMessageParam,
+    ChatCompletionUserMessageParam,
+)
 from transformers import GPT2Tokenizer  # type: ignore
 
 from components.config import config
 
 logger = logging.getLogger(__name__)
+
+MessageParamType = (
+    ChatCompletionSystemMessageParam
+    | ChatCompletionUserMessageParam
+    | ChatCompletionAssistantMessageParam
+    | ChatCompletionToolMessageParam
+    | ChatCompletionFunctionMessageParam
+)
 
 
 class LLMClient:
@@ -38,10 +52,10 @@ class LLMClient:
         if "local" in llm_api.url:
             await self.check_and_start_local_server(model_name)
 
-        system_message = ChatCompletionSystemMessageParam(role="system", content=self._get_system_message())
-        user_message = ChatCompletionUserMessageParam(role="user", content=prompt_text)
-
-        api_message = [system_message, user_message]
+        messages: list[MessageParamType] = [
+            ChatCompletionSystemMessageParam(role="system", content=self._get_system_message()),
+            ChatCompletionUserMessageParam(role="user", content=prompt_text),
+        ]
         if llm_api.max_output_tokens:
             adjusted_max_tokens = llm_api.max_output_tokens
         else:
@@ -54,7 +68,7 @@ class LLMClient:
                         truncation=True,
                     )
                 )
-                for message in [system_message, user_message]
+                for message in messages
             )
             adjusted_max_tokens = llm_api.max_context_tokens - num_tokens_used
 
@@ -68,7 +82,7 @@ class LLMClient:
             current_model = self.models[model_name]
             response = await current_model.chat.completions.create(
                 model=model_name,
-                messages=api_message,
+                messages=messages,
                 max_tokens=adjusted_max_tokens,
                 stream=True,
             )

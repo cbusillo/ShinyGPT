@@ -23,7 +23,6 @@ channels-redis = "^4.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.8.0"
 django-stubs = "^4.2.7"
 docker-stubs = { git = "https://github.com/rdozier-work/docker-stubs.git" }
 watchdog = { extras = ["watchmedo"], version = "^3.0.0" }
